@@ -2359,6 +2359,11 @@ long AAMPGstPlayer::GetPositionMilliseconds(void)
 		return rc;
 	}
 #ifdef USE_GST1
+//WMR CHANGE
+if (gst_element_query_position(privateContext->pipeline, format, &pos))
+  return (long)(pos / 1e6);
+else
+  return 0;
 	if (gst_element_query_position(privateContext->pipeline, format, &pos) &&
 		gst_element_query_duration(privateContext->pipeline, format, &len))
 #else

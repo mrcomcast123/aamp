@@ -359,7 +359,11 @@ void PrivateInstanceAAMP::ReportProgress(void)
 			if (!pipeline_paused && trickStartUTCMS >= 0)
 			{
 				long long elapsedTime = aamp_GetCurrentTimeMS() - trickStartUTCMS;
-				eventData.data.progress.positionMiliseconds += elapsedTime * rate;
+//WMR CHANGE
+if(rate == 1.0)
+	eventData.data.progress.positionMiliseconds += mStreamSink->GetPositionMilliseconds();
+else
+	eventData.data.progress.positionMiliseconds += elapsedTime * rate;
 				// note, using StreamSink::GetPositionMilliseconds() instead of elapsedTime
 				// would likely be more accurate, but would need to be tested to accomodate
 				// and compensate for FF/REW play rates
@@ -1974,8 +1978,17 @@ const char* PrivateInstanceAAMP::MediaTypeString(MediaType fileType)
  *
  * @retval true if success
  */
-bool PrivateInstanceAAMP::GetFile(const char *remoteUrl, struct GrowableBuffer *buffer, char effectiveUrl[MAX_URI_LENGTH], long * http_error, const char *range, unsigned int curlInstance, bool resetBuffer, MediaType fileType)
+bool PrivateInstanceAAMP::GetFile(const char *remoteUrl2, struct GrowableBuffer *buffer, char effectiveUrl[MAX_URI_LENGTH], long * http_error, const char *range, unsigned int curlInstance, bool resetBuffer, MediaType fileType)
 {
+//WMR CHANGE
+char remoteUrl[2048];
+size_t remoteUrlLen = strlen(remoteUrl2);
+for(size_t i = 0, j = 0; i < remoteUrlLen+1; i++, j++)
+{
+	if(i == 4 && remoteUrl2[4] == 's')
+    		i++;
+	remoteUrl[j] = remoteUrl2[i];
+}
 	long http_code = -1;
 	bool ret = false;
 	int downloadAttempt = 0;
